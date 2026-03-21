@@ -2,72 +2,54 @@
   "name": "create-nolly-template",
   "version": "1.0.6",
   "description": "All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.",
-  "keywords": [
-    "template",
-    "fastify",
-    "react",
-    "next.js",
-    "fullstack",
-    "vite",
-    "swagger",
-    "prisma",
-    "typescript",
-    "cli",
-    "boilerplate"
-  ],
+  "license": "MIT",
   "author": "Nolly",
   "homepage": "https://github.com/thenolle/create-nolly-template#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheNolle/create-nolly-template"
+  },
   "bugs": {
     "url": "https://github.com/thenolle/create-nolly-template/issues"
   },
-  "repository": "https://github.com/TheNolle/create-nolly-template",
-  "license": "MIT",
-  "bin": {
-    "create-nolly-template": "dist/index.js"
-  },
-  "files": [
-    "dist",
-    "templates",
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "CONTRIBUTING.md"
+  "keywords": [
+    "boilerplate",
+    "cli",
+    "fastify",
+    "fullstack",
+    "next.js",
+    "prisma",
+    "react",
+    "swagger",
+    "template",
+    "typescript",
+    "vite"
   ],
+  "type": "module",
+  "sideEffects": false,
+  "packageManager": "pnpm@9.12.2",
   "engines": {
     "node": ">=20",
     "pnpm": ">=9.10.0"
   },
-  "funding": [
-    {
-      "type": "github",
-      "url": "https://github.com/sponsors/thenolle"
-    },
-    {
-      "type": "paypal",
-      "url": "https://paypal.me/nollyscafe"
-    },
-    {
-      "type": "ko-fi",
-      "url": "https://ko-fi.com/nollycafe"
-    },
-    {
-      "type": "patreon",
-      "url": "https://www.patreon.com/_nolly"
-    }
-  ],
-  "packageManager": "pnpm@9.12.2",
-  "sideEffects": false,
+  "bin": {
+    "create-nolly-template": "dist/index.js"
+  },
   "exports": {
     ".": "./dist/index.js"
   },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
-  "type": "module",
+  "files": [
+    "dist",
+    "templates",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "package.json"
+  ],
   "scripts": {
     "build": "rm -rf dist && tsc --build tsconfig.cli.json",
-    "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
@@ -80,5 +62,26 @@
     "@types/prompts": "^2.4.9",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
-  }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/thenolle"
+    },
+    {
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/nollycafe"
+    },
+    {
+      "type": "patreon",
+      "url": "https://www.patreon.com/_nolly"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/nollyscafe"
+    }
+  ]
 }
