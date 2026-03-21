@@ -1,0 +1,26 @@
+# Build artifacts
+tsconfig*.json
+tsconfig.cli.tsbuildinfo
+dist/
+*.log
+.nyc_output/
+coverage/
+node_modules/
+
+# Dev tools
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+__tests__/
+test/
+*.test.ts
+
+# Source
+src/

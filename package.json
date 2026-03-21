@@ -1,0 +1,55 @@
+{
+  "name": "create-nolly-template",
+  "version": "1.0.5",
+  "description": "All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.",
+  "keywords": [
+    "template",
+    "fastify",
+    "react",
+    "next.js",
+    "fullstack",
+    "vite",
+    "swagger",
+    "prisma",
+    "typescript",
+    "cli",
+    "boilerplate"
+  ],
+  "author": "Nolly",
+  "license": "MIT",
+  "bin": {
+    "create-nolly-template": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "rm -rf dist && tsc --build tsconfig.cli.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.4",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.5.0",
+    "@types/prompts": "^2.4.9",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
