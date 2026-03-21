@@ -1,6 +1,6 @@
 {
   "name": "create-nolly-template",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.",
   "keywords": [
     "template",
@@ -16,6 +16,11 @@
     "boilerplate"
   ],
   "author": "Nolly",
+  "homepage": "https://github.com/thenolle/create-nolly-template#readme",
+  "bugs": {
+    "url": "https://github.com/thenolle/create-nolly-template/issues"
+  },
+  "repository": "https://github.com/TheNolle/create-nolly-template",
   "license": "MIT",
   "bin": {
     "create-nolly-template": "dist/index.js"
@@ -29,7 +34,31 @@
     "CONTRIBUTING.md"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=20",
+    "pnpm": ">=9.10.0"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/thenolle"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/nollyscafe"
+    },
+    {
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/nollycafe"
+    },
+    {
+      "type": "patreon",
+      "url": "https://www.patreon.com/_nolly"
+    }
+  ],
+  "packageManager": "pnpm@9.12.2",
+  "sideEffects": false,
+  "exports": {
+    ".": "./dist/index.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
