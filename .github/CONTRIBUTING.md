@@ -19,7 +19,7 @@ Thank you for your interest in contributing to `create-nolly-template`! This pro
 
 ## Getting Started
 
-Before you start contributing, please familiarize yourself with the project by reading the [README.md](README.md). It provides an overview of what the tool does, how to install it, and its usage.
+Before you start contributing, please familiarize yourself with the project by reading the [README.md](../README.md). It provides an overview of what the tool does, how to install it, and its usage.
 
 ## Development Setup
 
@@ -137,6 +137,6 @@ This project follows a code of conduct to ensure a welcoming environment for all
 
 ## License
 
-By contributing to this project, you agree that your contributions will be licensed under the same MIT License as the project. See [LICENSE](LICENSE) for details.
+By contributing to this project, you agree that your contributions will be licensed under the same MIT License as the project. See [LICENSE](../LICENSE) for details.
 
 Thank you for contributing! 🚀

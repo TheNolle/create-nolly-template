@@ -26,7 +26,7 @@ You can see the full list of available templates by running `create-nolly-templa
 
 ## Contributing
 If you want to contribute to this project, feel free to open a pull request or an issue. I would love to see your contributions!  
-See the [CONTRIBUTING](CONTRIBUTING.md) guide for more details.
+See the [CONTRIBUTING](.github/CONTRIBUTING.md) guide for more details.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
