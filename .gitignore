@@ -3,7 +3,5 @@ dist/
 .env
 *.log
 .DS_Store
-pnpm-lock.yaml
-pnpm-workspace.yaml
 .nyc_output/
 coverage/
