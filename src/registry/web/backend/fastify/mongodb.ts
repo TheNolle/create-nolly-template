@@ -3,20 +3,28 @@ import type { Feature } from '@/registry/types.js'
 export const mongodb: Feature = {
   key: 'mongodb',
   name: 'MongoDB support',
-  description: 'Adds MongoDB support',
+  description: 'Adds MongoDB support via prisma directly to your Fastify application.',
   templateRoot: 'web/backend/fastify/mongodb',
   dependencies: {
-    'fastify-plugin': '^5.1.0',
-    'mongodb': '^7.1.0'
+    '@prisma/client': '6.19'
+  },
+  devDependencies: {
+    '@types/node': '^18.0.0',
+    'prisma': '6.19'
   },
   patches: [
     {
-      targetPath: 'src/utils/env.ts',
+      targetPath: 'tsconfig.json',
       operations: [
         {
           type: 'insertAfter',
-          pattern: "NODE_ENV: z.enum\\(\\['development', 'production', 'test'\\]\\)\\.default\\('development'\\)",
-          insert: ",\tMONGO_URI: z.string().default('mongodb://localhost:27017/myapp'),\n\tMONGO_DB: z.string().default('myapp')"
+          pattern: "\"skipLibCheck\": true",
+          insert: ",\n\t\"types\": [\"node\"]"
+        },
+        {
+          type: 'insertAfter',
+          pattern: "\"src\"",
+          insert: ", \"prisma.config.ts\""
         }
       ]
     }
