@@ -1,6 +1,6 @@
 {
   "name": "create-nolly-template",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.",
   "license": "MIT",
   "author": "Nolly",
@@ -47,7 +47,7 @@
     "package.json"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc --build tsconfig.cli.json",
+    "build": "rm -rf dist && tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "prepublishOnly": "pnpm run build"

@@ -66,10 +66,9 @@ async function loadDirectoryIntoMap(root: string, baseDir: string, fileMap: Map<
 
 export async function buildProject(template: BaseTemplate, selectedFeatures: Feature[], answers: Record<string, string>, outputDir: string) {
   for (const feature of selectedFeatures) {
-    for (const conflict of feature.conflicts ?? []) {
-      if (selectedFeatures.some(f => f.key === conflict)) {
-        throw new Error(`Cannot select "${feature.name}" because it conflicts with "${conflict}"`)
-      }
+    if (feature.group && feature.exclusive) {
+      const conflict = selectedFeatures.find(f => f.group === feature.group && f.key !== feature.key)
+      if (conflict) throw new Error(`Cannot select "${feature.name}" because it is exclusive with "${conflict.name}" in group "${feature.group}"`)
     }
   }
   const fileMap = new Map<string, string>()
