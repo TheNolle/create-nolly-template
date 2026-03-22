@@ -1,6 +1,6 @@
 {
   "name": "create-nolly-template",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.",
   "license": "MIT",
   "author": "Nolly",
@@ -23,7 +23,10 @@
     "swagger",
     "template",
     "typescript",
-    "vite"
+    "vite",
+    "discord.js",
+    "discord",
+    "bots"
   ],
   "type": "module",
   "sideEffects": false,
