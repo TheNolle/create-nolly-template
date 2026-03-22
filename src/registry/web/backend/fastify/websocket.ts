@@ -24,8 +24,8 @@ export const websocket: Feature = {
         },
         {
           type: 'insertAfter',
-          pattern: `await autoRegister\\(app, 'routes/\\*\\*/\\.routes\\.{ts,js}\\)`,
-          insert: `  await autoRegister(app, 'routes/**/*.ws.{ts,js}', '/ws')`
+          pattern: `routes\.\\{ts,js\\}\'\\)`,
+          insert: `await autoRegister(app, 'routes/**/*.ws.{ts,js}', '/ws')`
         }
       ]
     }
