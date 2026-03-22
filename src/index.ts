@@ -1,8 +1,11 @@
 #!/usr/bin/env node
-import prompts from 'prompts'
+import Enquirer from 'enquirer'
 import { registry } from './registry/index.js'
 import { buildProject } from './builder.js'
 import packageJSON from '../package.json' with { type: 'json' }
+import { Feature } from './registry/types.js'
+
+const { Select, MultiSelect, Input } = Enquirer as any
 
 async function printHelp() {
   console.log(`
@@ -72,53 +75,74 @@ async function main() {
   if (args.includes('--about') || args.includes('-a')) return printAbout()
   if (args.includes('--list') || args.includes('-l')) return printList()
   console.log('\n🚀 Welcome to create-nolly-template!\n')
-  const { category } = await prompts({
-    type: 'select',
+  const category = await new Select({
     name: 'category',
     message: 'Main category',
-    choices: registry.map(category => ({ title: category.name, value: category }))
-  }) as { category: typeof registry[0] }
-  const { subCategory } = await prompts({
-    type: 'select',
+    choices: registry.map(c => c.name),
+    result(name: string) { return registry.find(c => c.name === name) }
+  }).run()
+  const subCategory = await new Select({
     name: 'subCategory',
     message: 'Sub category',
-    choices: category.subCategories.map(subCategory => ({ title: subCategory.name, value: subCategory }))
-  }) as { subCategory: typeof category.subCategories[0] }
-  if (!subCategory) process.exit(0)
-  const { template } = await prompts({
-    type: 'select',
+    choices: category.subCategories.map((s: any) => s.name),
+    result(name: string) { return category.subCategories.find((s: any) => s.name === name) }
+  }).run()
+  const template = await new Select({
     name: 'template',
     message: 'Base template',
-    choices: subCategory.templates.map(template => ({ title: template.name, value: template }))
-  }) as { template: typeof subCategory.templates[0] }
-  if (!template) process.exit(0)
-  let selectedFeatures: any[] = []
+    choices: subCategory.templates.map((t: any) => t.name),
+    result(name: string) { return subCategory.templates.find((t: any) => t.name === name) }
+  }).run()
+  let selectedFeatures: Feature[] = []
   if (template.features && template.features.length > 0) {
-    const { features } = await prompts({
-      type: 'multiselect',
+    const prompt = new MultiSelect({
       name: 'features',
       message: 'Optional features (space to toggle)',
-      choices: template.features.map((feature: any) => ({
-        title: feature.name,
-        value: feature,
-        description: feature.description
+      hint: 'Space to select · Enter to submit',
+      choices: template.features.map((f: Feature) => ({
+        name: f.key,
+        message: f.name,
+        hint: f.description
       })),
-      hint: '- Space to select. Return to submit'
-    }) as { features: any[] }
-    selectedFeatures = features ?? []
+      result(names: string[]) { return names.map(name => template.features.find((f: Feature) => f.key === name)) }
+    })
+    const selected = await prompt.run()
+    const groups = new Map<string, string>()
+    for (const feat of selected) {
+      if (feat.group && feat.exclusive) {
+        if (groups.has(feat.group)) {
+          throw new Error(`Feature "${feat.name}" is exclusive with another selected feature in group "${feat.group}"`)
+        }
+        groups.set(feat.group, feat.key)
+      }
+    }
+    selectedFeatures = selected
   }
-  const answers = await prompts(template.prompts)
-  const { outputDir } = await prompts({
-    type: 'text',
+  const answers: Record<string, string> = {}
+  for (const prompt of template.prompts) {
+    const value = await new Input({
+      name: prompt.name,
+      message: prompt.message,
+      initial: prompt.initial
+    }).run()
+    answers[prompt.name] = value
+  }
+  const outputDir = await new Input({
     name: 'outputDir',
     message: 'Output directory',
     initial: `./${answers.name || template.key}`
-  }) as { outputDir: string }
+  }).run()
   if (!outputDir) process.exit(0)
   await buildProject(template, selectedFeatures, answers, outputDir)
   console.log('\n✅ Project created at', outputDir)
   console.log('   Base:', template.name)
-  if (selectedFeatures.length > 0) console.log('   Features:', selectedFeatures.map((feature: any) => feature.name).join(', '))
+  if (selectedFeatures.length > 0) console.log('   Features:', selectedFeatures.map(f => f.name).join(', '))
+  for (const feature of selectedFeatures) {
+    if (feature.additionalMessages && feature.additionalMessages.length > 0) {
+      console.log(`\n📌 ${feature.name} - ${feature.description}`)
+      feature.additionalMessages.forEach((msg: string) => console.log(`   • ${msg}`))
+    }
+  }
   console.log('\n   cd', outputDir, '&& pnpm install\n')
 }
 

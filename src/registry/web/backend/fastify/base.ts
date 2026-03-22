@@ -2,6 +2,7 @@ import type { BaseTemplate } from '@/registry/types.js'
 import { swagger } from './swagger.js'
 import { websocket } from './websocket.js'
 import { mongodb } from './mongodb.js'
+import { postgresql } from './postgresql.js'
 
 export const fastify: BaseTemplate = {
   key: 'fastify',
@@ -14,6 +15,7 @@ export const fastify: BaseTemplate = {
   features: [
     swagger,
     websocket,
-    mongodb
+    mongodb,
+    postgresql
   ]
 }

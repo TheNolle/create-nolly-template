@@ -65,6 +65,13 @@ async function loadDirectoryIntoMap(root: string, baseDir: string, fileMap: Map<
 }
 
 export async function buildProject(template: BaseTemplate, selectedFeatures: Feature[], answers: Record<string, string>, outputDir: string) {
+  for (const feature of selectedFeatures) {
+    for (const conflict of feature.conflicts ?? []) {
+      if (selectedFeatures.some(f => f.key === conflict)) {
+        throw new Error(`Cannot select "${feature.name}" because it conflicts with "${conflict}"`)
+      }
+    }
+  }
   const fileMap = new Map<string, string>()
   const baseRoot = path.join(TEMPLATES_ROOT, template.templateRoot)
   await loadDirectoryIntoMap(baseRoot, baseRoot, fileMap)

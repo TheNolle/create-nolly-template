@@ -1,5 +1,3 @@
-import { PromptObject } from 'prompts'
-
 export type FilePatchOperation =
   | { type: 'replace', pattern: string | RegExp, replacement: string }
   | { type: 'insertBefore', pattern: string | RegExp, insert: string }
@@ -20,13 +18,16 @@ export type Feature = {
   patches?: FilePatch[]
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
+  group?: string
+  exclusive?: boolean
+  additionalMessages?: string[]
 }
 
 export type BaseTemplate = {
   key: string
   name: string
   description?: string
-  prompts: PromptObject[]
+  prompts: { type: 'text' | 'select', name: string, message: string, initial?: string, options?: { label: string, value: any }[] }[]
   templateRoot: string
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>

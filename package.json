@@ -1,6 +1,6 @@
 {
   "name": "create-nolly-template",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.",
   "license": "MIT",
   "author": "Nolly",
@@ -53,13 +53,12 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "fs-extra": "^11.3.4",
-    "prompts": "^2.4.2"
+    "enquirer": "^2.4.1",
+    "fs-extra": "^11.3.4"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^25.5.0",
-    "@types/prompts": "^2.4.9",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
