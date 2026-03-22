@@ -16,7 +16,7 @@ export const mongodb: Feature = {
         {
           type: 'insertAfter',
           pattern: "NODE_ENV: z.enum\\(\\['development', 'production', 'test'\\]\\)\\.default\\('development'\\)",
-          insert: "\tMONGODB_URI: z.string().default('mongodb://localhost:27017/myapp')"
+          insert: ",\tMONGO_URI: z.string().default('mongodb://localhost:27017/myapp'),\n\tMONGO_DB: z.string().default('myapp')"
         }
       ]
     }

@@ -1,6 +1,6 @@
 {
   "name": "create-nolly-template",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.",
   "license": "MIT",
   "author": "Nolly",
