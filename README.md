@@ -1,32 +1,86 @@
 # 🚀 create-nolly-template
 
-All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.
+[![npm version](https://img.shields.io/npm/v/create-nolly-template?color=blue&label=npm)](https://www.npmjs.com/package/create-nolly-template)
+[![npm downloads](https://img.shields.io/npm/dm/create-nolly-template?color=green&label=downloads)](https://www.npmjs.com/package/create-nolly-template)
+[![License](https://img.shields.io/npm/l/create-nolly-template?color=orange)](LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/thenolle/create-nolly-template?color=red)](https://github.com/thenolle/create-nolly-template/issues)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/thenolle/create-nolly-template/ci.yml?branch=master&label=last%20build&style=flat-square)](https://github.com/thenolle/create-nolly-template/actions)
+[![GitHub stars](https://img.shields.io/github/stars/thenolle/create-nolly-template?color=yellow)](https://github.com/thenolle/create-nolly-template/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/thenolle/create-nolly-template?color=blueviolet)](https://github.com/thenolle/create-nolly-template/network/members)
 
-## Install
+A fully opinionated CLI tool to bootstrap new projects using pre-defined templates - all of my templates in one place.
+
+---
+
+## 🔧 Installation
+
+Install globally via npm or pnpm:
+
 ```bash
-npm i -g create-nolly-template
-# or pnpm i -g create-nolly-template
+npm install -g create-nolly-template
+# or
+pnpm install -g create-nolly-template
+```
+You can also run without installing using npx or pnpx:
+```bash
+npx create-nolly-template
+# or
+pnpx create-nolly-template
 ```
 
-## Usage
+---
+
+## ⚡ Usage
+
+Create a new project interactively:
 ```bash
 create-nolly-template
-# or npx create-nolly-template
-# or pnpx create-nolly-template
 ```
 
-## Templates
-You can see the full list of available templates by running `create-nolly-template --list` or `create-nolly-template -l`.
+**List Available Templates**
+```bash
+create-nolly-template --list
+# or
+create-nolly-template -l
+```
 
-## Commands
-- `create-nolly-template` - Create a new project based on one of the templates.
-- `create-nolly-template --list` or `create-nolly-template -l` - List all available templates.
-- `create-nolly-template --help` or `create-nolly-template -h` - Show help message.
-- `create-nolly-template --about` or `create-nolly-template -a` - Show information about the project.
+---
 
-## Contributing
-If you want to contribute to this project, feel free to open a pull request or an issue. I would love to see your contributions!  
-See the [CONTRIBUTING](.github/CONTRIBUTING.md) guide for more details.
+## 📝 Commands
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+| Command                                 | Description                                  |
+| --------------------------------------- | -------------------------------------------- |
+| `create-nolly-template`                 | Launch the interactive project creation CLI. |
+| `create-nolly-template --list` or `-l`  | List all available templates.                |
+| `create-nolly-template --help` or `-h`  | Show the help message.                       |
+| `create-nolly-template --about` or `-a` | Show information about the CLI project.      |
+
+---
+
+## 📂 Templates
+
+All templates are opinionated and designed to help you quickly start a project with best practices.  
+Run the command below to see all available templates:
+```bash
+create-nolly-template --list
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Open an issue or submit a pull request to improve or add templates.  
+Please read the [CONTRIBUTING](./.github/CONTRIBUTING.md) guidelines before contributing.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+
+---
+
+## 🔗 Links
+
+- **GitHub Repository:** https://github.com/thenolle/create-nolly-template
+- **npm Package:** https://npmjs.com/package/create-nolly-template
