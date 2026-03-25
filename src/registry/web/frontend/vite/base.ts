@@ -1,6 +1,7 @@
 import type { BaseTemplate } from '@/registry/types.js'
 import { react } from './react.js'
 import { seo } from './seo.js'
+import { framer } from './framer.js'
 
 export const vite: BaseTemplate = {
   key: 'vite',
@@ -12,6 +13,7 @@ export const vite: BaseTemplate = {
   templateRoot: 'web/frontend/vite/base',
   features: [
     react,
-    seo
+    seo,
+    framer
   ]
 }

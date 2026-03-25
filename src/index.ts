@@ -3,70 +3,90 @@ import Enquirer from 'enquirer'
 import { registry } from './registry/index.js'
 import { buildProject } from './builder.js'
 import packageJSON from '../package.json' with { type: 'json' }
-import { BaseTemplate, Feature } from './registry/types.js'
+import { BaseTemplate, Category, Feature } from './registry/types.js'
+import chalk from 'chalk'
 
 const { Select, MultiSelect, Input } = Enquirer as any
 
 async function printHelp() {
-  console.log(`
-🚀 create-nolly-template v${packageJSON.version}
-
-${packageJSON.description}
-
-Usage:
-  create-nolly-template          Interactive wizard
-  create-nolly-template --help   This help
-  create-nolly-template --about  About & credits
-  create-nolly-template --list   List all templates
-
-Examples:
-  pnpx create-nolly-template
-  create-nolly-template -l
-  `)
+  console.log(chalk.bold.cyan(`\n🚀 create-nolly-template v${packageJSON.version}\n`))
+  console.log(chalk.white(`${packageJSON.description}\n`))
+  console.log(chalk.bold('💡 Usage:'))
+  console.log(chalk.white(`  ${chalk.green('create-nolly-template')}          Interactive wizard`))
+  console.log(chalk.white(`  ${chalk.green('create-nolly-template --help')}   Show this help`))
+  console.log(chalk.white(`  ${chalk.green('create-nolly-template --about')}  About & credits`))
+  console.log(chalk.white(`  ${chalk.green('create-nolly-template --list')}   List all templates\n`))
+  console.log(chalk.bold('📌 Examples:'))
+  console.log(chalk.white(`  ${chalk.green('pnpx create-nolly-template')}`))
+  console.log(chalk.white(`  ${chalk.green('create-nolly-template -l')}\n`))
+  console.log(chalk.gray('Run without args to start the interactive wizard.\n'))
   process.exit(0)
 }
 
 async function printAbout() {
-  console.log(`
-🚀 create-nolly-template v${packageJSON.version}
-
-${packageJSON.description}
-
-Nolly's templates. Zero-config, TypeScript-first.
-
-Templates: Fastify, WebSocket, Swagger, MongoDB, Prisma, and even more !
-Built with: TypeScript, ESM, fs-extra, prompts, and a lot of ❤️
-
-Made by Nolly, a passionate full-stack developer and open-source enthusiast.
-GitHub: thenolle/${packageJSON.name}
-License: ${packageJSON.license}
-`)
+  console.log(chalk.bold.cyan(`\n🚀 create-nolly-template v${packageJSON.version}\n`))
+  console.log(chalk.white(`${packageJSON.description}\n`))
+  console.log(chalk.bold.yellow('✨ Features & Philosophy'))
+  console.log(chalk.green('  • Zero-config templates'))
+  console.log(chalk.green('  • TypeScript-first, ESM-ready'))
+  console.log(chalk.green('  • Supports Fastify, WebSocket, Swagger, MongoDB, Prisma, and more\n'))
+  console.log(chalk.bold.yellow('🛠 Built with'))
+  console.log(chalk.cyan('  • TypeScript'))
+  console.log(chalk.cyan('  • fs-extra'))
+  console.log(chalk.cyan('  • Enquirer prompts'))
+  console.log(chalk.cyan('  • ❤️  Passion for developer experience\n'))
+  console.log(chalk.bold.yellow('👤 Author'))
+  console.log(chalk.white(`  Nolly - full-stack developer & open-source enthusiast`))
+  console.log(chalk.white(`  GitHub: ${chalk.blue(`https://github.com/thenolle/${packageJSON.name}`)}`))
+  console.log(chalk.white(`  License: ${chalk.magenta(packageJSON.license)}\n`))
+  console.log(chalk.gray('Run without args to start the interactive wizard.\n'))
   process.exit(0)
 }
 
-async function printList() {
-  console.log('\n📋 Available Templates & Features\n')
-  for (const category of registry) {
-    console.log(`┌─ ${category.name} (${category.key})`)
-    console.log('│')
-    if (category.templates) {
-      for (const template of category.templates) {
-        console.log(`│  ├─ ${template.name} (${template.key})`)
-      }
-    }
-    if (category.subCategories) {
-      for (const sub of category.subCategories) {
-        console.log(`│  ├─ ${sub.name} (${sub.key})`)
-        console.log('│  │')
-        for (const template of sub.templates) {
-          console.log(`│  │  ├─ ${template.name} (${template.key})`)
+function printList() {
+  console.log(chalk.bold.cyan(`🚀 Nolly Templates CLI\nExplore available templates and optional features\n`))
+  function printFeature(feature: Feature, featureMap: Map<string, Feature>, printed = new Set<string>(), indentLevel = 2, isDependency = false) {
+    if (printed.has(feature.key)) return
+    printed.add(feature.key)
+    const meta: string[] = []
+    if (feature.group) meta.push(`group: ${feature.group}${feature.exclusive ? ' (exclusive)' : ''}`)
+    if (feature.requires?.length) meta.push(`requires: ${feature.requires.join(', ')}`)
+    const metaStr = meta.length ? chalk.gray(` [${meta.join(' | ')}]`) : ''
+    const indentStr = ' '.repeat(indentLevel * 2)
+    const symbol = isDependency ? chalk.magenta('↳') : chalk.green('•')
+    const nameColor = isDependency ? chalk.magenta.bold : chalk.green.bold
+    console.log(`${indentStr}${symbol} ${nameColor(feature.name)} (${chalk.yellow(feature.key)})${metaStr}`)
+    if (!isDependency && feature.description) console.log(`${indentStr}  ${chalk.gray(feature.description)}`)
+    if (feature.requires) {
+      feature.requires.forEach(reqKey => {
+        const reqFeature = featureMap.get(reqKey)
+        if (reqFeature) {
+          printFeature(reqFeature, featureMap, printed, indentLevel + 1, true)
         }
-        console.log('│  │')
-      }
+      })
     }
-    console.log('│')
   }
-  console.log('Run without args for interactive mode.\n')
+  function printTemplate(template: BaseTemplate, indentLevel = 1) {
+    const indentStr = ' '.repeat(indentLevel * 2)
+    console.log(`${indentStr}${chalk.blue('▸')} ${chalk.bold.blue(template.name)} (${chalk.yellow(template.key)})`)
+    if (template.description) console.log(`${indentStr}  ${chalk.gray(template.description)}`)
+    const featureMap = new Map<string, Feature>()
+    template.features?.forEach(f => featureMap.set(f.key, f))
+    template.features?.forEach(f => printFeature(f, featureMap, new Set(), indentLevel + 1))
+    console.log('')
+  }
+  function printCategory(category: Category) {
+    console.log(chalk.bold.cyan(`${category.name} (${category.key})`))
+    category.templates?.forEach(t => printTemplate(t, 1))
+    category.subCategories?.forEach(sub => {
+      const indentStr = ' '.repeat(2)
+      console.log(`${indentStr}${chalk.cyan(sub.name)} (${chalk.yellow(sub.key)})`)
+      sub.templates.forEach(t => printTemplate(t, 2))
+    })
+  }
+  registry.forEach(printCategory)
+  console.log(chalk.gray('\nRun without args to start the interactive wizard.\n'))
+  console.log(`${chalk.bold.cyan('Category')} | ${chalk.cyan('Subcategory')} | ${chalk.bold.blue('Template')} | ${chalk.green('Feature')} | ${chalk.magenta('Dependency')} | ${chalk.yellow('Key')}`)
   process.exit(0)
 }
 

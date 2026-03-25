@@ -71,20 +71,36 @@ export async function buildProject(template: BaseTemplate, selectedFeatures: Fea
       if (conflict) throw new Error(`Cannot select "${feature.name}" because it is exclusive with "${conflict.name}" in group "${feature.group}"`)
     }
   }
+  const sortedFeatures: Feature[] = []
+  const visited = new Set<string>()
+  const featureMap = new Map(selectedFeatures.map(f => [f.key, f]))
+  const visit = (feat: Feature) => {
+    if (visited.has(feat.key)) return
+    visited.add(feat.key)
+    if (feat.requires) {
+      for (const depKey of feat.requires) {
+        const dep = featureMap.get(depKey)
+        if (!dep) throw new Error(`Feature "${feat.name}" requires unknown feature "${depKey}"`)
+        visit(dep)
+      }
+    }
+    sortedFeatures.push(feat)
+  }
+  selectedFeatures.forEach(f => visit(f))  
   const fileMap = new Map<string, string>()
   const baseRoot = path.join(TEMPLATES_ROOT, template.templateRoot)
   await loadDirectoryIntoMap(baseRoot, baseRoot, fileMap)
   const pkgRaw = fileMap.get('package.json')
   const pkg = pkgRaw ? JSON.parse(pkgRaw) : {}
   mergeIntoPackageJson(pkg, template.dependencies, template.devDependencies)
-  for (const feature of selectedFeatures) {
+  for (const feature of sortedFeatures) {
     if (feature.templateRoot) {
       const featureRoot = path.join(TEMPLATES_ROOT, feature.templateRoot)
       await loadDirectoryIntoMap(featureRoot, featureRoot, fileMap)
     }
     mergeIntoPackageJson(pkg, feature.dependencies, feature.devDependencies)
   }
-  const allPatches = selectedFeatures.flatMap(f => f.patches ?? [])
+  const allPatches = sortedFeatures.flatMap(f => f.patches ?? [])
   applyPatches(fileMap, allPatches)
   fileMap.set('package.json', JSON.stringify(pkg, null, 2))
   await fs.ensureDir(outputDir)
