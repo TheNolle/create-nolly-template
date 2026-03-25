@@ -93,6 +93,23 @@ async function main() {
     choices: subCategory.templates.map((t: any) => t.name),
     result(name: string) { return subCategory.templates.find((t: any) => t.name === name) }
   }).run()
+  function resolveFeatureDependencies(templateFeatures: Feature[], initialSelection: Feature[]): Feature[] {
+    const selectedMap = new Map<string, Feature>()
+    const featureMap = new Map(templateFeatures.map(f => [f.key, f]))
+    const addFeature = (feat: Feature) => {
+      if (selectedMap.has(feat.key)) return
+      selectedMap.set(feat.key, feat)
+      if (feat.requires) {
+        for (const reqKey of feat.requires) {
+          const reqFeat = featureMap.get(reqKey)
+          if (!reqFeat) throw new Error(`Feature "${feat.name}" requires unknown feature "${reqKey}"`)
+          addFeature(reqFeat)
+        }
+      }
+    }
+    for (const feat of initialSelection) addFeature(feat)
+    return Array.from(selectedMap.values())
+  }
   let selectedFeatures: Feature[] = []
   if (template.features && template.features.length > 0) {
     const prompt = new MultiSelect({
@@ -106,17 +123,29 @@ async function main() {
       })),
       result(names: string[]) { return names.map(name => template.features.find((f: Feature) => f.key === name)) }
     })
-    const selected = await prompt.run()
+    const selected = await prompt.run() as Feature[]
+    selectedFeatures = resolveFeatureDependencies(template.features, selected)
+    const selectedKeys = new Set(selected.map(f => f.key))
+    const autoAdded = selectedFeatures.filter(f => !selectedKeys.has(f.key))
+    if (autoAdded.length > 0) {
+      console.log('\nThe following features were automatically selected because they are required:')
+      autoAdded.forEach(f => console.log(`  • ${f.name}`))
+    }
     const groups = new Map<string, string>()
-    for (const feat of selected) {
+    for (const feat of selectedFeatures) {
       if (feat.group && feat.exclusive) {
         if (groups.has(feat.group)) {
-          throw new Error(`Feature "${feat.name}" is exclusive with another selected feature in group "${feat.group}"`)
+          const conflictingKey = groups.get(feat.group)
+          const conflicting = selectedFeatures.find(f => f.key === conflictingKey)
+          if (!conflicting) continue
+          throw new Error(
+            `Feature "${feat.name}" conflicts with "${conflicting?.name}" in group "${feat.group}".` +
+            ` This may be caused by an automatic dependency.`
+          )
         }
         groups.set(feat.group, feat.key)
       }
     }
-    selectedFeatures = selected
   }
   const answers: Record<string, string> = {}
   for (const prompt of template.prompts) {

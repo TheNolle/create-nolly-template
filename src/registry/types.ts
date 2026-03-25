@@ -21,6 +21,7 @@ export type Feature = {
   group?: string
   exclusive?: boolean
   additionalMessages?: string[]
+  requires?: string[]
 }
 
 export type BaseTemplate = {
