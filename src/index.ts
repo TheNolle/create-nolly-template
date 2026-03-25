@@ -112,6 +112,7 @@ async function main() {
   }
   let selectedFeatures: Feature[] = []
   if (template.features && template.features.length > 0) {
+    const featureMap = new Map(template.features.map((f: Feature) => [f.key, f]))
     const prompt = new MultiSelect({
       name: 'features',
       message: 'Optional features (space to toggle)',
@@ -119,9 +120,33 @@ async function main() {
       choices: template.features.map((f: Feature) => ({
         name: f.key,
         message: f.name,
-        hint: f.description
+        hint: f.requires?.length ? `${f.description ?? ''} (requires: ${f.requires.join(', ')})` : f.description
       })),
-      result(names: string[]) { return names.map(name => template.features.find((f: Feature) => f.key === name)) }
+      result(names: string[]) {
+        return names.map(name => template.features.find((f: Feature) => f.key === name))
+      }
+    })
+    function collectDependencies(feat: Feature, acc = new Set<string>()) {
+      if (!feat.requires) return acc
+      for (const key of feat.requires) {
+        if (acc.has(key)) continue
+        acc.add(key)
+        const dep = featureMap.get(key) as Feature | undefined
+        if (dep) collectDependencies(dep, acc)
+      }
+      return acc
+    }
+    prompt.on('toggle', (choice: any, enabled: boolean) => {
+      if (!enabled) return
+      const feat = featureMap.get(choice.name) as Feature | undefined
+      if (!feat) return
+      const deps = collectDependencies(feat)
+      for (const depKey of deps) {
+        const depChoice = prompt.choices.find((c: any) => c.name === depKey)
+        if (depChoice && !depChoice.enabled) {
+          prompt.enable(depChoice)
+        }
+      }
     })
     const selected = await prompt.run() as Feature[]
     selectedFeatures = resolveFeatureDependencies(template.features, selected)
