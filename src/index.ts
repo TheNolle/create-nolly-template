@@ -3,7 +3,7 @@ import Enquirer from 'enquirer'
 import { registry } from './registry/index.js'
 import { buildProject } from './builder.js'
 import packageJSON from '../package.json' with { type: 'json' }
-import { Feature } from './registry/types.js'
+import { BaseTemplate, Feature } from './registry/types.js'
 
 const { Select, MultiSelect, Input } = Enquirer as any
 
@@ -49,16 +49,17 @@ async function printList() {
   for (const category of registry) {
     console.log(`┌─ ${category.name} (${category.key})`)
     console.log('│')
-    for (const sub of category.subCategories) {
-      console.log(`│  ├─ ${sub.name} (${sub.key})`)
-      console.log('│  │')
-      for (const template of sub.templates) {
-        console.log(`│  │  ├─ ${template.name} (${template.key})`)
-        if (template.features?.length) {
-          console.log(`│  │  │  Features:`)
-          template.features.forEach(feat =>
-            console.log(`│  │  │    • ${feat.name} - ${feat.description}`)
-          )
+    if (category.templates) {
+      for (const template of category.templates) {
+        console.log(`│  ├─ ${template.name} (${template.key})`)
+      }
+    }
+    if (category.subCategories) {
+      for (const sub of category.subCategories) {
+        console.log(`│  ├─ ${sub.name} (${sub.key})`)
+        console.log('│  │')
+        for (const template of sub.templates) {
+          console.log(`│  │  ├─ ${template.name} (${template.key})`)
         }
         console.log('│  │')
       }
@@ -81,18 +82,65 @@ async function main() {
     choices: registry.map(c => c.name),
     result(name: string) { return registry.find(c => c.name === name) }
   }).run()
-  const subCategory = await new Select({
-    name: 'subCategory',
-    message: 'Sub category',
-    choices: category.subCategories.map((s: any) => s.name),
-    result(name: string) { return category.subCategories.find((s: any) => s.name === name) }
-  }).run()
-  const template = await new Select({
-    name: 'template',
-    message: 'Base template',
-    choices: subCategory.templates.map((t: any) => t.name),
-    result(name: string) { return subCategory.templates.find((t: any) => t.name === name) }
-  }).run()
+  let template: BaseTemplate | undefined
+  const hasTemplates = category.templates && category.templates.length > 0
+  const hasSubs = category.subCategories && category.subCategories.length > 0
+  if (hasTemplates && hasSubs) {
+    const allTemplates = [
+      ...category.templates!,
+      ...category.subCategories!.flatMap((s: any) => s.templates)
+    ]
+    template = await new Select({
+      name: 'template',
+      message: 'Base template',
+      choices: allTemplates.map((t: any) => t.name),
+      result(name: string) {
+        return allTemplates.find((t: any) => t.name === name)
+      }
+    }).run()
+  } else if (hasTemplates) {
+    if (category.templates!.length === 1) {
+      const selectedTemplate = category.templates![0]
+      template = selectedTemplate
+      console.log(`\n⚡ Auto-selected template: ${selectedTemplate.name}\n`)
+    } else {
+      template = await new Select({
+        name: 'template',
+        message: 'Base template',
+        choices: category.templates!.map((t: any) => t.name),
+        result(name: string) {
+          return category.templates!.find((t: any) => t.name === name)
+        }
+      }).run()
+    }
+  } else if (hasSubs) {
+    const subCategory = await new Select({
+      name: 'subCategory',
+      message: 'Sub category',
+      choices: category.subCategories!.map((s: any) => s.name),
+      result(name: string) {
+        return category.subCategories!.find((s: any) => s.name === name)
+      }
+    }).run()
+    if (subCategory.templates.length === 1) {
+      const selectedTemplate = subCategory.templates[0]
+      template = selectedTemplate
+      console.log(`\n⚡ Auto-selected template: ${selectedTemplate.name}\n`)
+    } else {
+      template = await new Select({
+        name: 'template',
+        message: 'Base template',
+        choices: subCategory.templates.map((t: any) => t.name),
+        result(name: string) {
+          return subCategory.templates.find((t: any) => t.name === name)
+        }
+      }).run()
+    }
+  }
+  if (!template) {
+    throw new Error(`No templates found for category "${category.name}"`)
+  }
+  const finalTemplate = template
   function resolveFeatureDependencies(templateFeatures: Feature[], initialSelection: Feature[]): Feature[] {
     const selectedMap = new Map<string, Feature>()
     const featureMap = new Map(templateFeatures.map(f => [f.key, f]))
@@ -111,19 +159,20 @@ async function main() {
     return Array.from(selectedMap.values())
   }
   let selectedFeatures: Feature[] = []
-  if (template.features && template.features.length > 0) {
-    const featureMap = new Map(template.features.map((f: Feature) => [f.key, f]))
+  if (finalTemplate.features && finalTemplate.features.length > 0) {
+    const features = finalTemplate.features!
+    const featureMap = new Map(features.map((f: Feature) => [f.key, f]))
     const prompt = new MultiSelect({
       name: 'features',
       message: 'Optional features (space to toggle)',
       hint: 'Space to select · Enter to submit',
-      choices: template.features.map((f: Feature) => ({
+      choices: features.map((f: Feature) => ({
         name: f.key,
         message: f.name,
         hint: f.requires?.length ? `${f.description ?? ''} (requires: ${f.requires.join(', ')})` : f.description
       })),
       result(names: string[]) {
-        return names.map(name => template.features.find((f: Feature) => f.key === name))
+        return names.map(name => features.find((f: Feature) => f.key === name))
       }
     })
     function collectDependencies(feat: Feature, acc = new Set<string>()) {
@@ -149,7 +198,7 @@ async function main() {
       }
     })
     const selected = await prompt.run() as Feature[]
-    selectedFeatures = resolveFeatureDependencies(template.features, selected)
+    selectedFeatures = resolveFeatureDependencies(features, selected)
     const selectedKeys = new Set(selected.map(f => f.key))
     const autoAdded = selectedFeatures.filter(f => !selectedKeys.has(f.key))
     if (autoAdded.length > 0) {
@@ -173,7 +222,7 @@ async function main() {
     }
   }
   const answers: Record<string, string> = {}
-  for (const prompt of template.prompts) {
+  for (const prompt of finalTemplate.prompts) {
     const value = await new Input({
       name: prompt.name,
       message: prompt.message,
@@ -184,12 +233,12 @@ async function main() {
   const outputDir = await new Input({
     name: 'outputDir',
     message: 'Output directory',
-    initial: `./${answers.name || template.key}`
+    initial: `./${answers.name || finalTemplate.key}`
   }).run()
   if (!outputDir) process.exit(0)
   await buildProject(template, selectedFeatures, answers, outputDir)
   console.log('\n✅ Project created at', outputDir)
-  console.log('   Base:', template.name)
+  console.log('   Base:', finalTemplate.name)
   if (selectedFeatures.length > 0) console.log('   Features:', selectedFeatures.map(f => f.name).join(', '))
   for (const feature of selectedFeatures) {
     if (feature.additionalMessages && feature.additionalMessages.length > 0) {
