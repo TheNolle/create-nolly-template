@@ -18,6 +18,7 @@ export type Feature = {
   patches?: FilePatch[]
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
+  commands?: Record<string, string>
   group?: string
   exclusive?: boolean
   additionalMessages?: string[]
@@ -32,6 +33,7 @@ export type BaseTemplate = {
   templateRoot: string
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
+  commands?: Record<string, string>
   features?: Feature[]
 }
 

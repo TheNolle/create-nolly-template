@@ -1,15 +1,12 @@
 import { Client } from './client'
-import { config } from './config'
-import { logger } from './logger'
+import { config } from './utils/config'
+import { logger } from './utils/logger'
 
 process.on('unhandledRejection', logger.error)
 process.on('uncaughtException', logger.error)
 
+logger.time('Startup')
 const client = new Client()
-
-const start = Date.now()
-
 await client.init()
 await client.login(config.token)
-
-logger.info(`Startup completed in ${Date.now() - start}ms`)
+logger.timeEnd('Startup')

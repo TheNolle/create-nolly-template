@@ -1,6 +1,6 @@
 import { EmbedBuilder, Colors, MessageFlags, InteractionReplyOptions, GuildMember, User } from 'discord.js'
 import type { Event } from '../types/event'
-import { logger } from '../logger'
+import { logger } from '../utils/logger'
 
 export default {
   name: 'interactionCreate',
@@ -28,7 +28,7 @@ export default {
     }
     try {
       await command.execute(client, interaction)
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error)
       const payload: InteractionReplyOptions = { embeds: [new EmbedBuilder().setDescription('There was an error while executing this command!').setColor(Colors.Red)], flags: [MessageFlags.Ephemeral] }
       if (interaction.replied || interaction.deferred) {

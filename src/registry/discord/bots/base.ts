@@ -1,4 +1,5 @@
 import type { BaseTemplate } from '@/registry/types.js'
+import { prisma } from './prisma.js'
 
 export const bots: BaseTemplate = {
   key: 'bots',
@@ -9,5 +10,6 @@ export const bots: BaseTemplate = {
   ],
   templateRoot: 'discord/bots/base',
   features: [
+    prisma
   ]
 }

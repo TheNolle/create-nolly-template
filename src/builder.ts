@@ -8,6 +8,10 @@ function mergeIntoPackageJson(pkg: Record<string, any>, dependencies?: Record<st
   if (devDependencies) pkg.devDependencies = { ...pkg.devDependencies, ...devDependencies }
 }
 
+function addCommandsToPackageJson(pkg: Record<string, any>, commands?: Record<string, string>) {
+  if (commands) pkg.scripts = { ...pkg.scripts, ...commands }
+}
+
 function applyReplacements(content: string, answers: Record<string, string>): string {
   let result = content
   for (const [key, value] of Object.entries(answers)) result = result.replace(new RegExp(`{{${key}}}`, 'g'), value)
@@ -99,6 +103,10 @@ export async function buildProject(template: BaseTemplate, selectedFeatures: Fea
       await loadDirectoryIntoMap(featureRoot, featureRoot, fileMap)
     }
     mergeIntoPackageJson(pkg, feature.dependencies, feature.devDependencies)
+  }
+  addCommandsToPackageJson(pkg, template.commands)
+  for (const feature of sortedFeatures) {
+    addCommandsToPackageJson(pkg, feature.commands)
   }
   const allPatches = sortedFeatures.flatMap(f => f.patches ?? [])
   applyPatches(fileMap, allPatches)
