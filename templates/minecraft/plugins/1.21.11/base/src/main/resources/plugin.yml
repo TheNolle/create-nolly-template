@@ -1,0 +1,9 @@
+name: ${project.artifactId}
+description: ${project.description}
+author: ${project.author}
+website: ${project.url}
+
+main: ${project.groupId}.${project.artifactId}.${project.name}
+version: ${project.version}
+
+api-version: 1.21

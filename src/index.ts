@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import Enquirer from 'enquirer'
 import { registry } from './registry/index.js'
-import { buildProject } from './builder.js'
+import { buildProject, resolveSuccessMessage } from './builder.js'
 import packageJSON from '../package.json' with { type: 'json' }
 import { BaseTemplate, Category, Feature } from './registry/types.js'
 import chalk from 'chalk'
@@ -250,23 +250,16 @@ async function main() {
     }).run()
     answers[prompt.name] = value
   }
-  const outputDir = await new Input({
-    name: 'outputDir',
-    message: 'Output directory',
-    initial: `./${answers.name || finalTemplate.key}`
-  }).run()
+  const outputDir = await new Input({ name: 'outputDir', message: 'Output directory', initial: `./${answers.name || finalTemplate.key}` }).run()
   if (!outputDir) process.exit(0)
   await buildProject(template, selectedFeatures, answers, outputDir)
-  console.log('\n✅ Project created at', outputDir)
-  console.log('   Base:', finalTemplate.name)
-  if (selectedFeatures.length > 0) console.log('   Features:', selectedFeatures.map(f => f.name).join(', '))
-  for (const feature of selectedFeatures) {
-    if (feature.additionalMessages && feature.additionalMessages.length > 0) {
-      console.log(`\n📌 ${feature.name} - ${feature.description}`)
-      feature.additionalMessages.forEach((msg: string) => console.log(`   • ${msg}`))
-    }
-  }
-  console.log('\n   cd', outputDir, '&& pnpm install\n')
+  const successMessage = resolveSuccessMessage(finalTemplate, selectedFeatures, outputDir, answers)
+  console.log(`\n${successMessage.title} ${outputDir}`)
+  if (successMessage.showBase) console.log('   Base:', finalTemplate.name)
+  if (successMessage.showFeatures && selectedFeatures.length > 0) console.log('   Features:', selectedFeatures.map(f => f.name).join(', '))
+  for (const message of successMessage.messages ?? []) console.log(`   • ${message}`)
+  if (successMessage.installCommand) console.log(`\n   ${successMessage.installCommand}\n`)
+  else console.log('')
 }
 
 main().catch(error => {
