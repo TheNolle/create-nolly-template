@@ -1,6 +1,6 @@
 {
   "name": "create-nolly-template",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "All of my opiniated templates in one place. This is a CLI tool to create a new project based on one of my templates.",
   "license": "MIT",
   "author": "Nolly",
@@ -29,7 +29,13 @@
     "bots",
     "framer-motion",
     "tailwindcss",
-    "framer"
+    "framer",
+    "minecraft",
+    "bukkit",
+    "spigot",
+    "paper",
+    "purpur",
+    "adventure"
   ],
   "type": "module",
   "sideEffects": false,
