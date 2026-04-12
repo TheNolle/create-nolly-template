@@ -1,5 +1,5 @@
 import type { SubCategory } from '@/registry/types.js'
-import { p1_21_11 } from './1.21.11/base'
+import { p1_21_11 } from './1.21.11/base.js'
 
 export const plugins: SubCategory = {
   key: 'plugins',

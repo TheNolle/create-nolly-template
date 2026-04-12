@@ -1,5 +1,5 @@
 import type { Category } from '@/registry/types.js'
-import { plugins } from './plugins'
+import { plugins } from './plugins/index.js'
 
 export const minecraft: Category = {
   key: 'minecraft',
